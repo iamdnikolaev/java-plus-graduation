@@ -38,4 +38,4 @@ logging:
               BasicBinder: TRACE
 
 server:
-  port: 0
+  port: 9090

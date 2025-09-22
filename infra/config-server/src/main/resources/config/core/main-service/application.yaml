@@ -36,3 +36,6 @@ logging:
 
 server:
   port: 0
+
+client:
+  url: http://localhost:9090
