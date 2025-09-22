@@ -1,7 +1,6 @@
 package ru.practicum;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ public class StatClient {
     /**
      * Instantiates a new Stat client.
      */
-    public StatClient(@Value("${client.url}") String clientUrl) {
+    public StatClient(String clientUrl) {
         this.restClient = RestClient.builder().baseUrl(clientUrl).build();
     }
 
