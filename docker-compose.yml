@@ -25,7 +25,7 @@ services:
       retries: 10
 
   ewm-service:
-    build: main-service
+    build: event-service
     container_name: ewm-server
     ports:
       - "8080:8080"
