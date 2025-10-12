@@ -5,12 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.CollectorGrpcClient;
 import ru.practicum.client.EventClient;
 import ru.practicum.client.UserClient;
 import ru.practicum.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.EventRequestStatusUpdateResult;
-import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.dto.event.EventFullDto;
+import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.enums.RequestStatus;
 import ru.practicum.exception.ConflictException;
@@ -31,6 +32,7 @@ public class RequestServiceImpl implements RequestService {
     UserClient userClient;
     RequestRepository requestRepository;
     RequestMapper requestMapper;
+    CollectorGrpcClient collectorGrpcClient;
 
     @Override
     public List<ParticipationRequestDto> getRequestByUserId(Long userId) {
@@ -57,6 +59,8 @@ public class RequestServiceImpl implements RequestService {
         requestToEventVerification(userDto, event);
         Request request = requestMapper.formUserAndEventToRequest(userDto, event);
         requestRepository.save(request);
+        collectorGrpcClient.sendEventRegistration(userId, eventId);
+
         return requestMapper.toParticipationRequestDto(request);
     }
 

@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -75,18 +77,47 @@ public class PublicEventController {
     /**
      * Gets event by id.
      *
+     * @param userId  the user
      * @param eventId the event id
-     * @param request the request
      * @return the event by id
      */
     @GetMapping("/{event-id}")
-    public EventFullDto getEventById(@PathVariable("event-id") Long eventId, HttpServletRequest request) {
+    public EventFullDto getEventById(@RequestHeader("X-EWM-USER-ID") Long userId, @PathVariable("event-id") Long eventId) {
         log.info("Получение информации о событии с id={}", eventId);
 
-        // Получение IP клиента
-        String clientIp = request.getRemoteAddr();
+        return eventService.getEventById(userId, eventId);
+    }
 
-        // Получение события через сервис
-        return eventService.getEventById(eventId, clientIp);
+    /**
+     * Get the recommendations to use.
+     *
+     * @param userId     id of the user.
+     * @param maxResults not used.
+     * @return the list of recommended events.
+     */
+    @GetMapping("/recommendations")
+    public List<EventShortDto> getRecommendations(@RequestHeader("X-EWM-USER-ID") Long userId, @RequestParam Integer maxResults) {
+        return eventService.getRecommendations(userId, maxResults);
+    }
+
+    /**
+     * Setting the like for an event
+     *
+     * @param userId  id of the user, who likes the event.
+     * @param eventId the event liked.
+     */
+    @PutMapping("/{eventId}/like")
+    public void setLikeEvent(@RequestHeader("X-EWM-USER-ID") Long userId, @PathVariable Long eventId) {
+        eventService.setLikeEvent(userId, eventId);
+    }
+
+    /**
+     * Get the interactions count for the list of events.
+     *
+     * @param eventIds the list of events to get for.
+     */
+    @GetMapping("/interactionsCount")
+    public void getInteractionsCount(@RequestParam List<Long> eventIds) {
+        eventService.getInteractionsCount(eventIds);
     }
 }

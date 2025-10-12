@@ -98,11 +98,11 @@ public interface EventService {
     /**
      * Gets event by id.
      *
-     * @param id       the id
-     * @param clientIp the client ip
+     * @param userId  id of the user
+     * @param eventId id of the event
      * @return the event by id
      */
-    EventFullDto getEventById(Long id, String clientIp);
+    EventFullDto getEventById(Long userId, Long eventId);
 
     /**
      * Gets event by id for admin.
@@ -119,5 +119,29 @@ public interface EventService {
      * @param count   count value to set
      */
     void setConfirmedRequests(Long eventId, Integer count);
+
+    /**
+     * Get the recommendations to use.
+     *
+     * @param userId     id of the user.
+     * @param maxResults not used.
+     * @return the list of recommended events.
+     */
+    List<EventShortDto> getRecommendations(Long userId, Integer maxResults);
+
+    /**
+     * Setting the like for an event
+     *
+     * @param userId  id of the user, who likes the event.
+     * @param eventId the event liked.
+     */
+    void setLikeEvent(Long userId, Long eventId);
+
+    /**
+     * Get the interactions count for the list of events.
+     *
+     * @param eventIds the list of events to get for.
+     */
+    void getInteractionsCount(List<Long> eventIds);
 }
 
