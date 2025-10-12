@@ -31,7 +31,8 @@ class EventServiceImplTest {
                 true,
                 EventState.PUBLISHED,
                 "title",
-                999L
+                999L,
+                0.0D
         );
     }
 }

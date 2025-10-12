@@ -22,9 +22,12 @@
 ## Модуль `stats`
 Ведет учет просмотров и позволяет делать различные выборки для анализа работы приложения:
 
-1. **stats-client** — http-клиент для доступа к серверу статистики из сервиса событий модуля `core`.
-2. **stats-dto** — подмодуль DTO для работы.
-3. **stats-server** — сервер статистики, ведущий учет.  
+1. **stats-client** — клиент для обеспечения взаимодействия с сервисами модуля `core`.
+2. **collector** — сервис для приема сообщений о действиях пользователей, используя gRPC.
+3. **aggregator** — сервис для расчета сходства мероприятий.
+4. **analyzer** — сервис для обработки запросов по gRPC и выдачи рекомендаций.
+5. **serialization** — классы схем сообщеий для взаимодействия.
+6. **kafka** — обработка потоков данных в реальном времени.
 
 ## Спецификации внешнего API
 Спецификации внешнего API можно найти по следующим ссылкам:
@@ -34,13 +37,16 @@
 ## Спецификация внутреннего API
 Взаимосвязь сервисов:
 
-| Сервис          | Используемые сервисы                                          |
-|-----------------|---------------------------------------------------------------|
-| event-service   | user-service, stats-server, request-service, comment-service |
-| comment-service | user-service, event-service                                   |
-| request-service | user-service, event-service                                   |
-| user-service    | -                                                             |
-| stats-service   | -                                                             |
+| Сервис          | Используемые сервисы                                                |
+|-----------------|---------------------------------------------------------------------|
+| event-service   | user-service, request-service, comment-service, collector, analyzer |
+| comment-service | user-service, event-service                                         |
+| request-service | user-service, event-service, collector                              |
+| user-service    | -                                                                   |
+| collector       | - aggregator через топик stats.user-actions.v1                      |
+| aggregator      | - analyzer через топик stats.events-similarity.v1                   |
+| analyzer        | -                                                                   |
+
 
 Описание внутренних API:
 
@@ -55,13 +61,23 @@
 
 | User API                                  | Описание                         |
 |-------------------------------------------|----------------------------------|
-| GET user-service//admin/users/{userId}    | Получение пользователя по ID     |
+| GET user-service/admin/users/{userId}     | Получение пользователя по ID     |
+
+| Collector API           | Описание                        |
+|-------------------------|---------------------------------|
+| gRPC collectUserAction  | Отметка о действии пользователя |
+
+| Analyzer API                   | Описание                                                                                                  |
+|--------------------------------|-----------------------------------------------------------------------------------------------------------|
+| gRPC getRecommendationsForUser | Получение рекомендаций по запросу пользователя                                                            |
+| gRPC getSimilarEvent           | Получение событий, максимально похожих согласно запросу пользователя, но с которыми он не взаимодествовал |
+| gRPC getInteractionsCount      | Получение мероприятий с суммой максимальных весов действий каждого пользователя с этими мероприятиями     |
+
 
 ## Тестирование
 Для проверки работы сервисов разработаны Postman-тесты. Они находятся по следующим ссылкам:
-1. [Проверка работоспособности основого сервиса](https://github.com/yandex-praktikum/java-plus-graduation/blob/ci/.github/workflows/stuff/postman/microservices/ewm-main-service.json)
-2. [Проверка работоспособности сервиса статистики](https://github.com/yandex-praktikum/java-plus-graduation/blob/ci/.github/workflows/stuff/postman/microservices/ewm-stat-service.json)
-3. [Проверка работоспособности сервиса комментариев](https://github.com/iamdnikolaev/java-explore-with-me-plus462/blob/main/postman/feature.json)
+1. [Проверка работоспособности сервиса с рекомендациями](https://github.com/yandex-praktikum/java-plus-graduation/blob/ci/.github/workflows/stuff/postman/recommendations/ewm-main-service.json)
+2. [Проверка работоспособности сервиса комментариев](https://github.com/iamdnikolaev/java-explore-with-me-plus462/blob/main/postman/feature.json)
 
 ## Стек технологий
 - Java
@@ -75,3 +91,6 @@
 - Maven
 - Postman
 - Feign Client
+- Apache Kafka
+- gRPC
+- Docker

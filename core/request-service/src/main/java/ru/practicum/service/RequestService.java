@@ -2,7 +2,7 @@ package ru.practicum.service;
 
 import ru.practicum.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.EventRequestStatusUpdateResult;
-import ru.practicum.dto.ParticipationRequestDto;
+import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.enums.RequestStatus;
 
 import java.util.List;
@@ -53,7 +53,8 @@ public interface RequestService {
      */
     EventRequestStatusUpdateResult requestUpdateStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 
-    /** Count requests on required status
+    /**
+     * Count requests on required status
      *
      * @param requestStatus the status to count
      * @param eventId       the evet id
